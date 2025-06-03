@@ -1,3 +1,7 @@
+/**
+ * Snake Game
+ * By: Anton and Zihang
+ */
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
