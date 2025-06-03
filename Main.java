@@ -14,6 +14,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class Main extends JComponent implements KeyListener, MouseListener, MouseMotionListener
 {
@@ -21,6 +22,9 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
     private int WIDTH;
     private int HEIGHT;
     private int tileSize;
+    
+    //stack for the food of Circs
+    private Stack<Circs> food;
     
     //add variables for snake aka user?
     
@@ -35,6 +39,9 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
         
         //the size of the tiles
         tileSize=40;
+        
+        //initializing stack 
+        food = new Stack<Circs>();
         
         //Setting up the GUI
         JFrame gui = new JFrame();//this makes the gui box
@@ -71,11 +78,19 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
         g.fillRect(0,0,WIDTH,HEIGHT);
         
         this.drawTiles(g);//calls method to draw the tiles for map of game
+        
+        //method to draw all the food
+        for(Circs c:food){
+            c.drawSelf(g);
+        }
     }
     public void loop()
     {
+        //adds food to map
+        if(food.size()<3)
+            this.generateFood();
         //place to put act method for moving snake
-        
+
         //Do not write below this
         repaint();
     }
@@ -96,6 +111,7 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
     }
     public void mouseClicked(MouseEvent e)
     {
+//        food.pop();test to see if random food generator works
     }
     public void mouseEntered(MouseEvent e)
     {
@@ -138,6 +154,16 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
                 }
             }
         }
+    }
+    
+    public void generateFood(){//method that generates location of new food and adds it to stack food
+        int row = (int)(Math.random()*(WIDTH/tileSize));//randomly chooses a row 
+        int col = (int)(Math.random()*(HEIGHT/tileSize));//note the 1st has position of 0
+        //coordinate values of corner of food are the row/col num times size 
+        int xCordinate = row*tileSize;
+        int yCordinate = col*tileSize;
+        
+        food.add(new Circs(xCordinate,yCordinate,tileSize,Color.red,0,0));//creates stationary food
     }
     public static void main(String[] args)
     {
