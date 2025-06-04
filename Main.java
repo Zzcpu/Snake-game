@@ -13,7 +13,6 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import java.awt.Font;
-import java.util.ArrayList;
 
 public class Main extends JComponent implements KeyListener, MouseListener, MouseMotionListener
 {
@@ -21,17 +20,17 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
     private int WIDTH;
     private int HEIGHT;
     private int tileSize;
-    
-    //add variables for snake aka user?
-    
+    private snake s  = new snake();
+
     //Default Constructor
     public Main()
     {
         //initializing instance variables
         
+
         //dimensions of the gui
-        WIDTH = 600;
-        HEIGHT = 600;
+        WIDTH = 640;
+        HEIGHT = 640;
         
         //the size of the tiles
         tileSize=40;
@@ -61,7 +60,20 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
     {
         //getting the key pressed
         int key = e.getKeyCode();
-        System.out.println(key);//find the key int from pressed key
+        if (s.getDirection() != "RIGHT" && (key == 37 || key == 65)) { // wasd or arrow keys
+            s.setDirection("LEFT");
+        }
+        else if (s.getDirection() != "DOWN" && (key == 38 || key == 87)) {
+            s.setDirection("UP");
+        }
+        else if (s.getDirection() != "LEFT" && (key == 39 || key == 68)) {
+            s.setDirection("RIGHT");
+        }
+        else if (s.getDirection() != "UP" && (key == 40 || key == 83)) {
+            s.setDirection("DOWN");
+        }
+
+        // System.out.println(key);//find the key int from pressed key
     }   
     //All your UI drawing goes in here
     public void paintComponent(Graphics g)
@@ -71,11 +83,12 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
         g.fillRect(0,0,WIDTH,HEIGHT);
         
         this.drawTiles(g);//calls method to draw the tiles for map of game
+        this.drawSnake(g);//calls method to draw the snake
     }
     public void loop()
     {
         //place to put act method for moving snake
-        
+        s.inch();
         //Do not write below this
         repaint();
     }
@@ -96,6 +109,7 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
     }
     public void mouseClicked(MouseEvent e)
     {
+        s.add();
     }
     public void mouseEntered(MouseEvent e)
     {
@@ -139,9 +153,18 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
             }
         }
     }
+
+    public void drawSnake(Graphics g) {
+        g.setColor(Color.BLUE);
+        for (int i = 0; i < s.snakeBody.size(); i++) {
+            int[] segment = s.getSegment(i);
+            g.fillRect(segment[0] * tileSize, segment[1] * tileSize, tileSize, tileSize);
+        }
+    }
+
     public static void main(String[] args)
     {
         Main g = new Main();
-        g.start(60);
+        g.start(6);
     }
 }
