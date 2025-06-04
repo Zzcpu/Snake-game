@@ -13,6 +13,8 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Stack;
 
 public class Main extends JComponent implements KeyListener, MouseListener, MouseMotionListener
 {
@@ -20,6 +22,12 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
     private int WIDTH;
     private int HEIGHT;
     private int tileSize;
+    
+    //stack for the food of Circs
+    private Stack<Food> mapFood;
+    
+    //add variables for snake aka user?
+    
     private snake s  = new snake();
 
     //Default Constructor
@@ -34,6 +42,9 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
         
         //the size of the tiles
         tileSize=40;
+        
+        //initializing stack 
+        mapFood = new Stack<Food>();
         
         //Setting up the GUI
         JFrame gui = new JFrame();//this makes the gui box
@@ -83,11 +94,32 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
         g.fillRect(0,0,WIDTH,HEIGHT);
         
         this.drawTiles(g);//calls method to draw the tiles for map of game
+        
+        //method to draw all the food
+        for(Food f:mapFood){
+            f.drawSelf(g);
+        }
         this.drawSnake(g);//calls method to draw the snake
     }
     public void loop()
     {
+        //adds food to map
+        if(mapFood.size()<3)
+            this.generateFood();
+        
+        //checks if head of snake collides with food
+        for(int i=0;i<mapFood.size();i++){
+            if(this.checkCollision(mapFood.get(i))){
+                if(mapFood.get(i).isSafe())
+                    s.add();
+                else
+                    s.subtract();
+                mapFood.remove(mapFood.get(i));
+            }
+        }
+        
         //place to put act method for moving snake
+
         s.inch();
         //Do not write below this
         repaint();
@@ -109,6 +141,7 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
     }
     public void mouseClicked(MouseEvent e)
     {
+//        food.pop();test to see if random food generator works
         s.add();
     }
     public void mouseEntered(MouseEvent e)
@@ -152,6 +185,36 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
                 }
             }
         }
+    }
+    
+    public void generateFood(){//method that generates location of new food and adds it to stack food
+        int row = (int)(Math.random()*(WIDTH/tileSize));//randomly chooses a row 
+        int col = (int)(Math.random()*(HEIGHT/tileSize));//note the 1st has position of 0
+        //coordinate values of corner of food are the row/col num times size 
+        int xCordinate = col*tileSize;
+        int yCordinate = row*tileSize;
+        
+        String type = "Apple";
+        Color c = Color.red;
+        boolean isSafe = true;
+        double rand = Math.random();
+        if(rand<.25){//25% chance of poison food
+            type="poison";
+            isSafe=false;
+            c=Color.MAGENTA;
+        }
+        else if(rand<.50){//25% chance of lemon
+            c=Color.yellow;
+            type="lemon";
+        }//50% chance of apple
+        
+        mapFood.add(new Food(type,isSafe,xCordinate,yCordinate,tileSize,c,0,0));//creates stationary food
+    }
+    
+    public boolean checkCollision(Food f){//tldr if snake head has same coordinate (col,row) then they collided
+        if(f.getRow()==s.getSegment(0)[1]&&f.getCol()==s.getSegment(0)[0])
+            return true;
+        return false;
     }
 
     public void drawSnake(Graphics g) {
