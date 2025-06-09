@@ -57,16 +57,16 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
         //getting the key pressed
         int key = e.getKeyCode();
         if (s.getDirection() != "RIGHT" && (key == 37 || key == 65)) { // wasd or arrow keys
-            s.setDirection("LEFT");
+            s.setNextDirection("LEFT");
         }
         else if (s.getDirection() != "DOWN" && (key == 38 || key == 87)) {
-            s.setDirection("UP");
+            s.setNextDirection("UP");
         }
         else if (s.getDirection() != "LEFT" && (key == 39 || key == 68)) {
-            s.setDirection("RIGHT");
+            s.setNextDirection("RIGHT");
         }
         else if (s.getDirection() != "UP" && (key == 40 || key == 83)) {
-            s.setDirection("DOWN");
+            s.setNextDirection("DOWN");
         }
 
         // System.out.println(key);//find the key int from pressed key
@@ -84,7 +84,10 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
     public void loop()
     {
         //place to put act method for moving snake
-        s.inch();
+        s.updateDirection();
+        if (!s.checkNextSelfCollision() && !checkWallCollision()) { // checks for collision before moving
+            s.inch();
+        }
         //Do not write below this
         repaint();
     }
@@ -156,6 +159,14 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
             int[] segment = s.getSegment(i);
             g.fillRect(segment[0] * tileSize, segment[1] * tileSize, tileSize, tileSize);
         }
+    }
+
+    public boolean checkWallCollision() {
+        int gridWidth = WIDTH / tileSize;
+        int gridHeight = HEIGHT / tileSize;
+        int[] head = s.getNextSegment();
+        //  || left wall   || right wall           || top wall    || bottom wall
+        return head[0] < 0 || head[0] >= gridWidth || head[1] < 0 || head[1] >= gridHeight;
     }
 
     public static void main(String[] args)

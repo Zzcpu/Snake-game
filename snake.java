@@ -3,6 +3,7 @@ import java.util.LinkedList;
 public class snake {
     public LinkedList<int[]> snakeBody = new LinkedList<>();
     public String snakeHeadDirection;
+    public String nextSnakeHeadDirection;
     
     public snake() { //default constructor
         //initialize snake of size 4 and pointing upwards near the center of the screen, [8, 8] - [8, 11]
@@ -11,6 +12,7 @@ public class snake {
         snakeBody.add(new int[]{8, 10}); // 2
         snakeBody.add(new int[]{8, 11}); // 3
         snakeHeadDirection = "UP";
+        nextSnakeHeadDirection = snakeHeadDirection;
     }
 
     public snake(int x, int y, int length, String dir) { //parameterized constructor
@@ -41,8 +43,33 @@ public class snake {
         return snakeBody.get(index);
     }
 
+    public int[] getNextSegment() { // returns the value at the next segment (the segment that will be the head after inching)
+        int[] head = snakeBody.get(0);
+        int[] nextSegment = new int[]{head[0], head[1]};
+        
+        if (snakeHeadDirection ==  "UP") {
+            nextSegment[1] -= 1;
+        } else if (snakeHeadDirection ==  "DOWN") {
+            nextSegment[1] += 1;
+        } else if (snakeHeadDirection ==  "LEFT") {
+            nextSegment[0] -= 1;
+        } else if (snakeHeadDirection ==  "RIGHT") {
+            nextSegment[0] += 1;
+        }
+        
+        return nextSegment;
+    }
+
     public void setDirection(String dir) { // sets the direction of the snake's head
         snakeHeadDirection = dir;
+    }
+
+    public void setNextDirection(String dir) { // sets the next direction of the snake's head
+        nextSnakeHeadDirection = dir;
+    }
+
+    public void updateDirection() {
+        snakeHeadDirection = nextSnakeHeadDirection; // updates the direction of the snake's head to the next direction
     }
 
     public String getDirection() { // returns the direction of the snake's head
@@ -67,5 +94,57 @@ public class snake {
         // System.out.println(snakeHeadDirection);
         // System.out.println("Head: [" + snakeBody.get(0)[0] + ", " + snakeBody.get(0)[1] + "]");
         // System.out.println("==========================");
+    }
+
+    public boolean checkSelfCollision() { // checks if the snake has collided with itself
+        for (int i = 1; i < snakeBody.size(); i++) {
+            if (snakeBody.get(0)[0] == snakeBody.get(i)[0] && snakeBody.get(0)[1] == snakeBody.get(i)[1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkNextSelfCollision() { // checks if the snake will collide with itself in the next move
+        int[] head = snakeBody.get(0);
+        int[] futureHead = new int[]{head[0], head[1]};
+        
+        if (snakeHeadDirection ==  "UP") {
+            futureHead[1] -= 1;
+        } else if (snakeHeadDirection ==  "DOWN") {
+            futureHead[1] += 1;
+        } else if (snakeHeadDirection ==  "LEFT") {
+            futureHead[0] -= 1;
+        } else if (snakeHeadDirection ==  "RIGHT") {
+            futureHead[0] += 1;
+        }
+        
+        for (int i = 1; i < snakeBody.size(); i++) {
+            if (futureHead[0] == snakeBody.get(i)[0] && futureHead[1] == snakeBody.get(i)[1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkTileCollision(int[] tile) { // checks if the snake's head is on the specified tile
+        return snakeBody.get(0)[0] == tile[0] && snakeBody.get(0)[1] == tile[1];
+    }
+
+    public boolean checkNextTileCollision(int[] tile) { // checks if the snake's head will be on the specified tile in the next move
+        int[] head = snakeBody.get(0);
+        int[] futureHead = new int[]{head[0], head[1]};
+        
+        if (snakeHeadDirection ==  "UP") {
+            futureHead[1] -= 1;
+        } else if (snakeHeadDirection ==  "DOWN") {
+            futureHead[1] += 1;
+        } else if (snakeHeadDirection ==  "LEFT") {
+            futureHead[0] -= 1;
+        } else if (snakeHeadDirection ==  "RIGHT") {
+            futureHead[0] += 1;
+        }
+        
+        return futureHead[0] == tile[0] && futureHead[1] == tile[1];
     }
 }
