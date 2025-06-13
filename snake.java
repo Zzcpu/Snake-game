@@ -76,6 +76,10 @@ public class snake {
         return snakeHeadDirection;
     }
 
+    public LinkedList<int[]> getBody() { // returns the snake's body
+        return snakeBody;
+    }
+
     public void inch() { // the snake inches
         for (int i = snakeBody.size() - 1; i > 0; i--) { // moves each segment to the position of the one in front of it, starting from the tail
             int[] prev = snakeBody.get(i - 1);

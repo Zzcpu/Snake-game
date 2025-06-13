@@ -17,12 +17,12 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
     private int HEIGHT;
     private int tileSize;
     private snake s  = new snake();
+    private food f = new food(); // by default generates one food item, you can add more if you want
 
     //Default Constructor
     public Main()
     {
         //initializing instance variables
-        
 
         //dimensions of the gui
         WIDTH = 640;
@@ -30,7 +30,10 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
         
         //the size of the tiles
         tileSize=40;
-        
+
+        f.clear();
+        f.generateFood((WIDTH/tileSize), (HEIGHT/tileSize), s.getBody());
+
         //Setting up the GUI
         JFrame gui = new JFrame();//this makes the gui box
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//makes sure program can close
@@ -80,12 +83,18 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
         
         this.drawTiles(g);//calls method to draw the tiles for map of game
         this.drawSnake(g);//calls method to draw the snake
+        this.drawFood(g);//calls method to draw the food
     }
     public void loop()
     {
         //place to put act method for moving snake
         s.updateDirection();
         if (!s.checkNextSelfCollision() && !checkWallCollision()) { // checks for collision before moving
+            if (checkFoodCollision()) { // checks for food before moving
+                f.remove(f.isFood(s.getNextSegment()[0], s.getNextSegment()[1])); // removes the food that was eaten
+                s.add();
+                f.generateFood((WIDTH/tileSize), (HEIGHT/tileSize), s.getBody());
+            }
             s.inch();
         }
         //Do not write below this
@@ -108,7 +117,6 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
     }
     public void mouseClicked(MouseEvent e)
     {
-        s.add();
     }
     public void mouseEntered(MouseEvent e)
     {
@@ -161,13 +169,31 @@ public class Main extends JComponent implements KeyListener, MouseListener, Mous
         }
     }
 
-    public boolean checkWallCollision() {
+    public void drawFood(Graphics g) {
+        g.setColor(Color.RED);
+        for (int i = 0; i < f.size(); i++) {
+            int[] foodItem = f.getFood(i);
+            g.fillRect(foodItem[0] * tileSize, foodItem[1] * tileSize, tileSize, tileSize);
+        }
+    }
+
+    public boolean checkWallCollision() { // checks if the snake's head is colliding with the walls
         int gridWidth = WIDTH / tileSize;
         int gridHeight = HEIGHT / tileSize;
         int[] head = s.getNextSegment();
         //  || left wall   || right wall           || top wall    || bottom wall
         return head[0] < 0 || head[0] >= gridWidth || head[1] < 0 || head[1] >= gridHeight;
     }
+
+    public boolean checkFoodCollision() { // checks if the snake's head is on any food tile
+        for (int i = 0; i < f.size(); i++) {
+            if (s.checkNextTileCollision(f.getFood(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public static void main(String[] args)
     {
