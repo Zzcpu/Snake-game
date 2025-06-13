@@ -29,14 +29,26 @@ public class snake {
         snakeHeadDirection = dir;
     }
 
-    public void add() {
-        // adds a segment at the position of the tail (2 segments will share the same position)
-        snakeBody.add(new int[]{snakeBody.getLast()[0], snakeBody.getLast()[1]});
+    public void add(int n) {
+        int count = 1;
+        if (n > 0) {
+            count = n;
+        }
+        for (int i = 0; i < count; i++) {
+            // adds a segment at the position of the tail (2 segments will share the same position)
+            snakeBody.add(new int[]{snakeBody.getLast()[0], snakeBody.getLast()[1]});
+        }
     }
 
-    public void subtract() {
-        // subtracts a tail segment
-        snakeBody.removeLast();
+    public void subtract(int n) {
+        int count = 1;
+        if (n > 0) {
+            count = n;
+        }
+        for (int i = 0; i < count && snakeBody.size() > 0; i++) {
+            // subtracts a tail segment
+            snakeBody.removeLast();
+        }
     }
 
     public int[] getSegment(int index) { // returns the value at the specified segment
